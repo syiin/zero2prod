@@ -30,3 +30,6 @@
 3. Misc aside, reminder to self:
    1. `#[derive(serde::Deserialize)]` is saying to implement the serde::Deserialize trait for `FormData`
    2. `impl<T> Serialize for Vec<T>` is an implementation of Serialize for `Vec`, NOT a definition of the trait
+
+# 3.8
+1. Personal reflection: API integration tests agnostic to the underlying implementation (ie. instead of querying the database within the test to check for side effects, query a GET endpoint to inspect the data after the fact)
