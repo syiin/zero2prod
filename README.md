@@ -4,6 +4,7 @@
 3. Package auditing: `cargo audit`
 4. Formatting: `cargo fmt`
 5. Expanding macros: `cargo expand`
+   1. For specific files `cargo expand --test health_check`
 6. Run the server: `cargo run`
 
 # Personal notes
