@@ -20,3 +20,13 @@
 
 ## 3.5
 1. Port 0 triggers an OS scan for whatever available port
+
+## 3.7
+1. actix-web's handlers calls the from_request methods inside the arguments passed before they even get passed to the handler
+   1. This allows the handler to deal with strongly typed arguments
+   2. The data (ie. FormData) handles the data itself
+   3. So, what's happening is when the email or name is missing, FormData wrapped in serde will return 400 without us needing to explicitly handle it in the handler
+2. Serde stands for serialisation/deserialisation
+3. Misc aside, reminder to self:
+   1. `#[derive(serde::Deserialize)]` is saying to implement the serde::Deserialize trait for `FormData`
+   2. `impl<T> Serialize for Vec<T>` is an implementation of Serialize for `Vec`, NOT a definition of the trait
