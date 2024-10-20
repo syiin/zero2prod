@@ -41,5 +41,8 @@
 # 3.8
 1. Personal reflection: API integration tests agnostic to the underlying implementation (ie. instead of querying the database within the test to check for side effects, query a GET endpoint to inspect the data after the fact)
 2. `export DATABASE_URL=postgres://app:secret@localhost:5432/newsletter && sqlx migrate run`
+3. `lib.rs` and `main.rs` are special files as defined in the `Cargo.toml` - ie. that's why lib is where public modules are specified
+   1. Then the `routes/mod.rs` defines what is exposed there
+4. The Turbofish operator defines generics in a function: `fn pair<T, U>(first: T, second: U) -> (T, U)` and used by: `pair::<i32, &str>(42, "hello")`
 
 
