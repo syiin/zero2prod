@@ -12,6 +12,6 @@ pub fn run() -> Result<Server, std::io::Error> {
         })
         .bind("127.0.0.1:8000")?
         .run();
-    // No .await here!
+
     Ok(server)
 }
