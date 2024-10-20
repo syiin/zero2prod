@@ -6,7 +6,7 @@
 5. Expanding macros: `cargo expand`
    1. For specific files `cargo expand --test health_check`
 6. Run the server: `cargo run`
-7. Starting a database: `SKIP_DOCKER=true ./scripts/init_db.sh”`
+7. Starting a database: `SKIP_DOCKER=true ./scripts/init_db.sh`
 1. To create & run migrations:
    ```
    sqlx migrate add create_subscriptions_table
