@@ -1,4 +1,4 @@
-# Rust Cheat Sheet
+# Commands Cheat Sheet
 1. Sort of hot testing & reloading: `cargo watch -x check`
 2. Linting: `cargo clippy`
 3. Package auditing: `cargo audit`
@@ -6,6 +6,13 @@
 5. Expanding macros: `cargo expand`
    1. For specific files `cargo expand --test health_check`
 6. Run the server: `cargo run`
+7. Starting a database: `SKIP_DOCKER=true ./scripts/init_db.sh”`
+1. To create & run migrations:
+   ```
+   sqlx migrate add create_subscriptions_table
+   export DATABASE_URL=postgres://app:secret@localhost:5432/newsletters
+   sqlx migrate run
+   ```
 
 # Personal notes
 
@@ -33,3 +40,6 @@
 
 # 3.8
 1. Personal reflection: API integration tests agnostic to the underlying implementation (ie. instead of querying the database within the test to check for side effects, query a GET endpoint to inspect the data after the fact)
+2. `export DATABASE_URL=postgres://app:secret@localhost:5432/newsletter && sqlx migrate run`
+
+
