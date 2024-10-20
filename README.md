@@ -45,4 +45,16 @@
    1. Then the `routes/mod.rs` defines what is exposed there
 4. The Turbofish operator defines generics in a function: `fn pair<T, U>(first: T, second: U) -> (T, U)` and used by: `pair::<i32, &str>(42, "hello")`
 
+# 3.9
+1. `HttpServer::new` takes a closure and invokes this function whenever a new worker is created
+   1. This is why it has to be cloneable
+2. Arc - Atomic Reference Counter
+   1. `Arc<T>` is always cloneable and passes a pointer to this single instance 
+   2. web::Data wraps the connection in an Arc and passes to every worker
+3. actix-web uses a type-map (ie. `{HashMap<TypeId, Box<dyn Any>>}`)
+   1. When a request is received, it looks for the TypeId of the parameter
+   2. If there are multiple parameters of the same type, you have to wrap them in 2 different structs eg. `MainDatabaseConnection` and `LoggingDatabaseConnection`
+4. The Rust compiler enforces that there can only be one active mutable reference at a time and so, sqlx's execute asks for a mutable pgConnection so it can be sure that it and only it can run queries over the same connection
+5. `move` inside the Http::Server::new makes the closure take ownership of `db_pool` instead of just borrowing it - otherwise, the db_pool might outlive the closure
+
 
