@@ -38,14 +38,14 @@
    1. `#[derive(serde::Deserialize)]` is saying to implement the serde::Deserialize trait for `FormData`
    2. `impl<T> Serialize for Vec<T>` is an implementation of Serialize for `Vec`, NOT a definition of the trait
 
-# 3.8
+## 3.8
 1. Personal reflection: API integration tests agnostic to the underlying implementation (ie. instead of querying the database within the test to check for side effects, query a GET endpoint to inspect the data after the fact)
 2. `export DATABASE_URL=postgres://app:secret@localhost:5432/newsletter && sqlx migrate run`
 3. `lib.rs` and `main.rs` are special files as defined in the `Cargo.toml` - ie. that's why lib is where public modules are specified
    1. Then the `routes/mod.rs` defines what is exposed there
 4. The Turbofish operator defines generics in a function: `fn pair<T, U>(first: T, second: U) -> (T, U)` and used by: `pair::<i32, &str>(42, "hello")`
 
-# 3.9
+## 3.9
 1. `HttpServer::new` takes a closure and invokes this function whenever a new worker is created
    1. This is why it has to be cloneable
 2. Arc - Atomic Reference Counter
@@ -57,4 +57,5 @@
 4. The Rust compiler enforces that there can only be one active mutable reference at a time and so, sqlx's execute asks for a mutable pgConnection so it can be sure that it and only it can run queries over the same connection
 5. `move` inside the Http::Server::new makes the closure take ownership of `db_pool` instead of just borrowing it - otherwise, the db_pool might outlive the closure
 
-
+## 3.10
+1. The `Executor` trait imported from `sqlx` is needed to make `connection.execute()` work - otherwise the trait isn't in scope
