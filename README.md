@@ -59,3 +59,6 @@
 
 ## 3.10
 1. The `Executor` trait imported from `sqlx` is needed to make `connection.execute()` work - otherwise the trait isn't in scope
+2. "Observability is about being able to ask arbitrary questions about
+your environment without — and this is the key part — having to know
+ahead of time what you wanted to ask."
