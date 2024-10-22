@@ -7,12 +7,13 @@
    1. For specific files `cargo expand --test health_check`
 6. Run the server: `cargo run`
 7. Starting a database: `SKIP_DOCKER=true ./scripts/init_db.sh`
-1. To create & run migrations:
+8. To create & run migrations:
    ```
    sqlx migrate add create_subscriptions_table
    export DATABASE_URL=postgres://app:secret@localhost:5432/newsletters
    sqlx migrate run
    ```
+9. `curl -i -X POST -d 'email=thomas_mann@hotmail.com&name=Tom' http://127.0.0.1:8000/subscriptions`
 
 # Personal notes
 
@@ -62,3 +63,6 @@
 2. "Observability is about being able to ask arbitrary questions about
 your environment without — and this is the key part — having to know
 ahead of time what you wanted to ask."
+
+## 4.5
+1. The exiting a span (`->`) involves temporarily putting a span down (eg. polled a future). Closing a span (`-`) involves finally when the span is dropped (ie. Rust's RAII system)
