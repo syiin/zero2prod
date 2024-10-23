@@ -13,7 +13,8 @@
    export DATABASE_URL=postgres://app:secret@localhost:5432/newsletters
    sqlx migrate run
    ```
-9. `curl -i -X POST -d 'email=thomas_mann@hotmail.com&name=Tom' http://127.0.0.1:8000/subscriptions`
+9. Test submitting a subscriber: `curl -i -X POST -d 'email=thomas_mann@hotmail.com&name=Tom' http://127.0.0.1:8000/subscriptions`
+10. Generate cached queries for compilation without a database: `cargo sqlx prepare --workspace -- --all-targets`
 
 # Personal notes
 
