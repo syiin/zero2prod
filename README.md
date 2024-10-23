@@ -66,3 +66,7 @@ ahead of time what you wanted to ask."
 
 ## 4.5
 1. The exiting a span (`->`) involves temporarily putting a span down (eg. polled a future). Closing a span (`-`) involves finally when the span is dropped (ie. Rust's RAII system)
+2. HRTBs are written using for<'a> syntax. The for<'a> declares that the following trait bound or function is valid for all lifetimes 'a
+   1. `where` this is about constraits, eg. generic `Sink` implements the `Send` + `Sync` traits
+   2. `for<'a>MakeWriter<'a>` means, `Sink` must be able to make a writer for any possible lifetime `<'a>`
+   3. `'static` means `Sink` must have no non-static references

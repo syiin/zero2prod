@@ -1,5 +1,4 @@
 use actix_web::{web, HttpResponse};
-use tracing::Instrument;
 use sqlx::PgPool;
 use chrono::Utc;
 use uuid::Uuid;
@@ -10,49 +9,48 @@ pub struct FormData {
     name: String
 }
 
-pub async fn subscribe(
-        _form: web::Form<FormData>, 
-        _connection: web::Data<PgPool>) -> HttpResponse {
-    let request_id = Uuid::new_v4();
-    let request_span = tracing::info_span!(
-        "Adding a new subscriber.",
-        %request_id,
+#[tracing::instrument(
+    name = "Adding a new subscriber",
+    skip(_form, _pool),
+    fields(
         subscriber_email = %_form.email,
         subscriber_name = %_form.name
-    );
-    let _request_span_guard = request_span.enter();
-    let query_span = tracing::info_span!(
-        "Saving new subscriber details in the database"
-    );
-    match sqlx::query!(
-        r#"
+    )
+)]
+pub async fn subscribe(
+    _pool: web::Data<PgPool>,
+    _form: web::Form<FormData>,
+) -> HttpResponse {
+    match insert_subscriber(&_form, &_pool).await
+    {
+        Ok(_) => HttpResponse::Ok().finish(),
+        Err(_) => HttpResponse::InternalServerError().finish()
+    }
+}
+
+#[tracing::instrument(
+    name = "Saving new subscriber details in the database",
+    skip(_form, _pool)
+)]
+pub async fn insert_subscriber(
+    _form: &FormData, 
+    _pool: &PgPool) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+            r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
         VALUES ($1, $2, $3, $4)
-        "#,
-        Uuid::new_v4(),
-        _form.email,
-        _form.name,
-        Utc::now()
-    )
-    .execute(_connection.get_ref())
-    .instrument(query_span)
-    .await
-    {
-        Ok(_) => {
-            tracing::info!(
-                "request_id {} - New subscriber details have been saved",
-                request_id
-            );
-            HttpResponse::Ok().finish()
-    }   ,
-        Err(e) => {
-            tracing::error!(
-                "request_id {} - Failed to execute query: {:?}",
-                request_id,
-                e
-            );
-            HttpResponse::InternalServerError().finish()
-        }
-    }
+                "#,
+            Uuid::new_v4(),
+            _form.email,
+            _form.name,
+            Utc::now()
+        )
+        .execute(_pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("Failed to execute query: {:?}", e);
+            e  
+        })?;
+    Ok(())
 }
 
