@@ -15,6 +15,11 @@
    ```
 9. Test submitting a subscriber: `curl -i -X POST -d 'email=thomas_mann@hotmail.com&name=Tom' http://127.0.0.1:8000/subscriptions`
 10. Generate cached queries for compilation without a database: `cargo sqlx prepare --workspace -- --all-targets`
+11. Run with network: `docker run -p 8000:8000 --network my-network zero2prod-network zero2prod`
+12. Digital ocean deploy:
+    1.  First time: `doctl apps create --spec spec.yaml`
+    2.  Deploy: `doctl apps update 82c8a437-1920-4230-b5b7-f446f9a5eff3 --spec=spec.yaml`
+    3.  APP ID from: `doctl apps list`
 
 # Personal notes
 
