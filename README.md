@@ -20,6 +20,7 @@
     1.  First time: `doctl apps create --spec spec.yaml`
     2.  Deploy: `doctl apps update 82c8a437-1920-4230-b5b7-f446f9a5eff3 --spec=spec.yaml`
     3.  APP ID from: `doctl apps list`
+    4.  Migrate database: `DATABASE_URL=postgres://newsletter:{PASSWORD}@app-1f6b10e0-d334-40f0-9800-ee4444479a98-do-user-14672112-0.e.db.ondigitalocean.com:25060/newsletter sqlx migrate run`
 
 # Personal notes
 
