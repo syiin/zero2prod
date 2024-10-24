@@ -71,3 +71,8 @@ ahead of time what you wanted to ask."
    1. `where` this is about constraits, eg. generic `Sink` implements the `Send` + `Sync` traits
    2. `for<'a>MakeWriter<'a>` means, `Sink` must be able to make a writer for any possible lifetime `<'a>`
    3. `'static` means `Sink` must have no non-static references
+
+## 5.38
+1. Reminders on how to optimise docker things:
+   1. Use and update your .dockerignore
+   2. Stage your docker builds
