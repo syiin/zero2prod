@@ -16,11 +16,7 @@ services:
       # Depending on when you created the repository, 
       # the default branch on GitHub might have been named `master`
       branch: master
-      # Deploy a new version on every commit to `main`! 
-      # Continuous Deployment, here we come!
-      deploy_on_push: true
-      # !!! Fill in with your details
-      # e.g. LukeMathWalker/zero-to-production
+      deploy_on_push: false
       repo: syiin/zero2prod
     # Active probe used by DigitalOcean's to ensure our application is healthy
     health_check:
