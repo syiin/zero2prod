@@ -82,3 +82,7 @@ ahead of time what you wanted to ask."
 1. Reminders on how to optimise docker things:
    1. Use and update your .dockerignore
    2. Stage your docker builds
+
+## 6.0
+1. Type driven development - how subscriber was defined as a type to make it impossible to pass bad data
+2. Panics are supposed to be responses to unrecoverable scenarios - user inputs are not one of these
