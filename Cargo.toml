@@ -31,7 +31,6 @@ quickcheck = "1.0.3"
 quickcheck_macros = "1"
 rand = "0.8"
 unicode-segmentation = "1"
-# Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
 version = "0.8"
 default-features = false
@@ -43,6 +42,13 @@ features = [
     "chrono", 
     "migrate"
 ]
+[dependencies.reqwest]
+version = "0.12" 
+default-features = false
+# We need the `json` feature flag to serialize/deserialize JSON payloads
+features = ["json", "rustls-tls"]
+
 
 [dev-dependencies]
-reqwest = "0.12"
+wiremock = "0.6"
+tokio = { version = "1", features = ["rt", "macros"] }
