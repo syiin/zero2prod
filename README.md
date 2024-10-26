@@ -100,3 +100,4 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
 # 7.0
 1. Connection Pooling - most HTTP clients offer this where a connection is kept open in case after a request in case the connection needs to be used again to fire off another request
 2. `.clone` creates a copy of the cloned object every time so if there are data fields, it is preferable to use an Arc than it is to make the object clone-able.
+3. `to_owned` converts borrowed data to owned data, usually by cloning
