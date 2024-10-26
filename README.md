@@ -88,3 +88,11 @@ ahead of time what you wanted to ask."
 2. Panics are supposed to be responses to unrecoverable scenarios - user inputs are not one of these
 3. "A grapheme is defined by the Unicode standard as a "user-perceived" 
 character: `å` is a single grapheme, but it is composed of two characters (`a` and `̊`).`graphemes` returns an iterator over the graphemes in the input `s`. `true` specifies that we want to use the extended grapheme definition set, the recommended one."
+4. Property based testing:
+   1. The `#[quickcheck_macros::quickcheck]` runs iterations of the testing
+   2. `Arbitrary`
+      1. `fn arbitrary` takes a generator and returns an instance of the given type
+      2. `fn shrink` returns a sequences of gradually shrinking instances
+      3. These can't do this so well with a String so...
+   3. We create a type that implements our own `fn arbitrary` and have that generate random email strings with `faker`
+5. The `TryFrom` trait implements a `try_form` method that converts one type into another, returning a `Result` (ie. instead of writing your own conversion function)
