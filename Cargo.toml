@@ -24,6 +24,12 @@ tracing-actix-web = "0.7"
 tracing-log = "0.2"
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 tracing-bunyan-formatter = "0.3"
+claims = "0.7"
+validator = "0.18"
+fake = "2.9"
+quickcheck = "1.0.3"
+quickcheck_macros = "1"
+rand = "0.8"
 unicode-segmentation = "1"
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
