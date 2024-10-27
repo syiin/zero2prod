@@ -40,6 +40,8 @@ pub async fn spawn_app() -> TestApp {
     let email_server = MockServer::start().await;
 
     // Randomise configuration to ensure test isolation
+    // Unlike main, don't just get the database config - get the database config and adapt it
+    // to our requirements for a test environment
     let configuration = {
         let mut c = get_configuration().expect("Failed to read configuration.");
         // Use a different database for each test case
