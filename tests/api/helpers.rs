@@ -1,12 +1,11 @@
+use secrecy::Secret;
 use std::sync::LazyLock;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
-use std::net::TcpListener;
-use uuid::Uuid;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
-use zero2prod::email_client::EmailClient;
-use zero2prod::startup::run;
+use zero2prod::startup::{Application, get_connection_pool};
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
-use secrecy::Secret;
+use uuid::Uuid;
+use wiremock::MockServer;
 
 // Ensure tracing stack is initialised only once with LazyLock
 static TRACING: LazyLock<()> = LazyLock::new(|| {
@@ -37,31 +36,34 @@ pub struct TestApp {
 pub async fn spawn_app() -> TestApp {
     LazyLock::force(&TRACING);
 
-    let listener = TcpListener::bind("127.0.0.1:0")
-        .expect("Failed to bind random port");
-    let port = listener.local_addr().unwrap().port();
-    let address = format!("http://127.0.0.1:{}", port);
+    // Launch a mock server to stand in for Postmark's API
+    let email_server = MockServer::start().await;
 
-    let mut configuration = get_configuration().expect("Failed to read configuration.");
-    configuration.database.database_name = Uuid::new_v4().to_string();
-    let connection_pool = configure_database(&configuration.database).await;
+    // Randomise configuration to ensure test isolation
+    let configuration = {
+        let mut c = get_configuration().expect("Failed to read configuration.");
+        // Use a different database for each test case
+        c.database.database_name = Uuid::new_v4().to_string();
+        // Use a random OS port
+        c.application.port = 0;
+        // Use the mock server as email API
+        c.email_client.base_url = email_server.uri();
+        c
+    };
 
-    let sender_email = configuration.email_client.sender()
-        .expect("Invalid sender email address.");
-    let timeout = configuration.email_client.timeout();
-    let email_client = EmailClient::new(
-        configuration.email_client.base_url,
-        sender_email,
-        configuration.email_client.authorization_token,
-        timeout
-    );
+    // Create and migrate the database
+    configure_database(&configuration.database).await;
 
-    let server = run(listener, connection_pool.clone(), email_client)
-        .expect("Failed to bind address");
-    let _ = tokio::spawn(server);
+    // Launch the application as a background task
+    let application = Application::build(configuration.clone())
+        .await
+        .expect("Failed to build application.");
+    let application_port = application.port();
+    let _ = tokio::spawn(application.run_until_stopped());
+
     TestApp {
-        address,
-        db_pool: connection_pool,
+        address: format!("http://localhost:{}", application_port),
+        db_pool: get_connection_pool(&configuration.database),
     }
 }
 
@@ -85,11 +87,9 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
     let connection_pool = PgPool::connect_with(config.connect_options())
         .await
         .expect("Failed to connect to Postgres.");
-
     sqlx::migrate!("./migrations")
         .run(&connection_pool)
         .await
         .expect("Failed to migrate the database");
-
     connection_pool
 }
