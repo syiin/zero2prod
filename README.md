@@ -104,3 +104,6 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
 4. Each file within the `/tests` folder gets compiled into its own crate
    1. Consequence of this is helper methods end up compiled each individual crate file causing method not used warnings
    2. Executables are compiled in parallel but the linking phase is sequential so having a large flat binary is slow
+5. Rolling things for reliability
+   1. Deploys - multiple instances behind a load balancer - blue green or canary
+   2. Database migrations - eg. columns being non-null first
