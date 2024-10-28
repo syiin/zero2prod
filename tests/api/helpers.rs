@@ -31,6 +31,7 @@ static TRACING: LazyLock<()> = LazyLock::new(|| {
 pub struct TestApp {
     pub address: String,
     pub db_pool: PgPool,
+    pub email_server: MockServer,
 }
 
 impl TestApp {
@@ -78,6 +79,7 @@ pub async fn spawn_app() -> TestApp {
     TestApp {
         address: format!("http://localhost:{}", application_port),
         db_pool: get_connection_pool(&configuration.database),
+        email_server: email_server
     }
 }
 

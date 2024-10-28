@@ -1,4 +1,3 @@
-use std::ops::Sub;
 use reqwest::Client;
 use secrecy::Secret;
 use crate::domain::SubscriberEmail;
