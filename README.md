@@ -107,3 +107,6 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
 5. Rolling things for reliability
    1. Deploys - multiple instances behind a load balancer - blue green or canary
    2. Database migrations - eg. columns being non-null first
+
+# 8.0
+1. Run test and parse: `RUST_LOG=sqlx=error,info TEST_LOG=true cargo test subscribe_fails_if_there_is_a_fatal_database_error | bunyan`
