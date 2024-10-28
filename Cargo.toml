@@ -33,6 +33,7 @@ quickcheck_macros = "1"
 rand = { version = "0.8", features = ["std_rng"] }
 unicode-segmentation = "1"
 linkify = "0.10"
+thiserror = "1"
 [dependencies.sqlx]
 version = "0.8"
 default-features = false

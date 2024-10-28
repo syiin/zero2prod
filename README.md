@@ -110,3 +110,8 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
 
 # 8.0
 1. Run test and parse: `RUST_LOG=sqlx=error,info TEST_LOG=true cargo test subscribe_fails_if_there_is_a_fatal_database_error | bunyan`
+2. The way types are used to handle control flow further remind me of the fat models skinny controllers pattern in RoR - you define types and they determine what behaviour is emitted based on the data
+   1. the `From` trait let's us cast from one type to another using `?` - hence why we could map from `sqlx::Error` to `SubscriberError`
+   2. the `fmt` function with `match` is what let us define what display to run depending on the enum type
+   3. the `source` fn with `match` is what let map any error into the option interface needed
+   4. and `status_code` with `match` lets us decide what type enum pairs to what status code
