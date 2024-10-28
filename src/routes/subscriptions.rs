@@ -4,6 +4,7 @@ use chrono::Utc;
 use uuid::Uuid;
 use crate::domain::{SubscriberName, SubscriberEmail, NewSubscriber};
 use crate::email_client::EmailClient;
+use crate::startup::ApplicationBaseUrl;
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
@@ -23,7 +24,7 @@ impl TryFrom<FormData> for NewSubscriber {
 
 #[tracing::instrument(
     name = "Adding a new subscriber",
-    skip(_form, _pool, _email_client),
+    skip(_form, _pool, _email_client, base_url),
     fields(
         subscriber_email = %_form.email,
         subscriber_name = %_form.name
@@ -33,6 +34,7 @@ pub async fn subscribe(
     _pool: web::Data<PgPool>,
     _form: web::Form<FormData>,
     _email_client: web::Data<EmailClient>,
+    base_url: web::Data<ApplicationBaseUrl>,
 ) -> HttpResponse {
     let new_subscriber = match _form.0.try_into() {
         Ok(form) => form,
@@ -43,7 +45,11 @@ pub async fn subscribe(
         return HttpResponse::InternalServerError().finish();
     }
 
-    if send_confirmation_email(&_email_client, new_subscriber)
+    if send_confirmation_email(
+        &_email_client,
+        new_subscriber,
+        &base_url.0
+    )
         .await
         .is_err()
     {
@@ -54,11 +60,14 @@ pub async fn subscribe(
 
 #[tracing::instrument(
     name = "Send a confirmation email to a new subscriber",
-    skip(_email_client, new_subscriber)
+    skip(_email_client, new_subscriber, base_url)
 )]
-async fn send_confirmation_email(_email_client: &EmailClient, new_subscriber: NewSubscriber) -> Result<(), reqwest::Error>{
-    let confirmation_link = 
-        "https://there-is-no-such-domain.com/subscriptions/confirm";
+async fn send_confirmation_email(
+    _email_client: &EmailClient,
+    new_subscriber: NewSubscriber,
+    base_url: &str,
+) -> Result<(), reqwest::Error>{
+    let confirmation_link = format!("{}/subscriptions/confirm?subscription_token=mytoken", base_url);
     _email_client
         .send_email(
             new_subscriber.email,
