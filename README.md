@@ -115,3 +115,11 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
    2. the `fmt` function with `match` is what let us define what display to run depending on the enum type
    3. the `source` fn with `match` is what let map any error into the option interface needed
    4. and `status_code` with `match` lets us decide what type enum pairs to what status code
+3. Errors should be logged where they are handled - ie. if they propogate it upwards, they shouldn't log it
+4. General rule for what tools to handle what errors:
+```
+| Category     | Internal                | At the edge    |
+|--------------|-------------------------|-----------------|
+| Control Flow | Types, methods, fields  | Status codes    |
+| Reporting    | Logs/traces             | Response body   |
+```
