@@ -1,38 +1,29 @@
 use secrecy::Secret;
-use std::sync::LazyLock;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
-use zero2prod::configuration::{get_configuration, DatabaseSettings};
-use zero2prod::startup::{Application, get_connection_pool};
-use zero2prod::telemetry::{get_subscriber, init_subscriber};
+use std::sync::LazyLock;
 use uuid::Uuid;
 use wiremock::MockServer;
+use zero2prod::configuration::{get_configuration, DatabaseSettings};
+use zero2prod::startup::{get_connection_pool, Application};
+use zero2prod::telemetry::{get_subscriber, init_subscriber};
 
 // Ensure tracing stack is initialised only once with LazyLock
 static TRACING: LazyLock<()> = LazyLock::new(|| {
     let subscriber_name = "test".to_string();
     let default_filter_level = "info".to_string();
     if std::env::var("TEST_LOG").is_ok() {
-        let subscriber = get_subscriber(
-            subscriber_name, 
-            default_filter_level, 
-            std::io::stdout
-        );
+        let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
         init_subscriber(subscriber);
     } else {
-        let subscriber = get_subscriber(
-            subscriber_name, 
-            default_filter_level, 
-            std::io::sink
-        );
+        let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::sink);
         init_subscriber(subscriber);
     };
 });
 
 pub struct ConfirmationLinks {
     pub html: reqwest::Url,
-    pub plain_text: reqwest::Url
+    pub plain_text: reqwest::Url,
 }
-
 
 pub struct TestApp {
     pub port: u16,
@@ -52,13 +43,8 @@ impl TestApp {
             .expect("Failed to execute request.")
     }
     /// Extract the confirmation links embedded in the request to the email API.
-    pub fn get_confirmation_links(
-        &self, 
-        email_request: &wiremock::Request
-    ) -> ConfirmationLinks {
-        let body: serde_json::Value = serde_json::from_slice(
-            &email_request.body
-        ).unwrap();
+    pub fn get_confirmation_links(&self, email_request: &wiremock::Request) -> ConfirmationLinks {
+        let body: serde_json::Value = serde_json::from_slice(&email_request.body).unwrap();
 
         // Extract the link from one of the request fields.
         let get_link = |s: &str| {
@@ -77,10 +63,7 @@ impl TestApp {
 
         let html = get_link(&body["HtmlBody"].as_str().unwrap());
         let plain_text = get_link(&body["TextBody"].as_str().unwrap());
-        ConfirmationLinks {
-            html,
-            plain_text
-        }
+        ConfirmationLinks { html, plain_text }
     }
 }
 
@@ -118,7 +101,7 @@ pub async fn spawn_app() -> TestApp {
         port: application_port,
         address: format!("http://localhost:{}", application_port),
         db_pool: get_connection_pool(&configuration.database),
-        email_server: email_server
+        email_server: email_server,
     }
 }
 
@@ -148,3 +131,4 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to migrate the database");
     connection_pool
 }
+

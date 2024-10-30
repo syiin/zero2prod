@@ -1,14 +1,14 @@
+use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
-use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
+use sqlx::PgPool;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
-use actix_web::dev::Server;
 
-use crate::email_client::EmailClient;
-use crate::routes::{health_check, subscribe, confirm, publish_newsletter};
-use crate::configuration::Settings;
 use crate::configuration::DatabaseSettings;
+use crate::configuration::Settings;
+use crate::email_client::EmailClient;
+use crate::routes::{confirm, health_check, publish_newsletter, subscribe};
 
 pub struct Application {
     port: u16,
@@ -40,10 +40,11 @@ impl Application {
         let listener = TcpListener::bind(address)?;
         let port = listener.local_addr().unwrap().port();
         let server = run(
-            listener, 
+            listener,
             connection_pool,
             email_client,
-            configuration.application.base_url,)?;
+            configuration.application.base_url,
+        )?;
 
         // We "save" the bound port in one of `Application`'s fields
         Ok(Self { port, server })
@@ -53,7 +54,7 @@ impl Application {
         self.port
     }
 
-    // A more expressive name that makes it clear that 
+    // A more expressive name that makes it clear that
     // this function only returns when the application is stopped.
     pub async fn run_until_stopped(self) -> Result<(), std::io::Error> {
         self.server.await
@@ -61,40 +62,37 @@ impl Application {
 }
 
 // We need to define a wrapper type in order to retrieve the URL
-// in the `subscribe` handler. 
+// in the `subscribe` handler.
 // Retrieval from the context, in actix-web, is type-based: using
 // a raw `String` would expose us to conflicts.
 pub struct ApplicationBaseUrl(pub String);
 
 pub fn run(
-    listener: TcpListener, 
+    listener: TcpListener,
     db_pool: PgPool,
     email_client: EmailClient,
-    base_url: String
+    base_url: String,
 ) -> Result<Server, std::io::Error> {
     let db_pool = web::Data::new(db_pool);
     let email_client = web::Data::new(email_client);
     let base_url = web::Data::new(ApplicationBaseUrl(base_url));
     let server = HttpServer::new(move || {
-            App::new()
-                .wrap(TracingLogger::default())
-                .route("/health-check", web::get().to(health_check))
-                .route("/subscriptions", web::post().to(subscribe))
-                .route("/subscriptions/confirm", web::get().to(confirm))
-                .route("/newsletters", web::post().to(publish_newsletter))
-                .app_data(db_pool.clone())
-                .app_data(email_client.clone())
-                .app_data(base_url.clone())
-        })
-        .listen(listener)?
-        .run();
+        App::new()
+            .wrap(TracingLogger::default())
+            .route("/health-check", web::get().to(health_check))
+            .route("/subscriptions", web::post().to(subscribe))
+            .route("/subscriptions/confirm", web::get().to(confirm))
+            .route("/newsletters", web::post().to(publish_newsletter))
+            .app_data(db_pool.clone())
+            .app_data(email_client.clone())
+            .app_data(base_url.clone())
+    })
+    .listen(listener)?
+    .run();
     Ok(server)
 }
 
-pub fn get_connection_pool(
-    configuration: &DatabaseSettings
-) -> PgPool {
-    PgPoolOptions::new().connect_lazy_with(
-        configuration.connect_options()
-    )
+pub fn get_connection_pool(configuration: &DatabaseSettings) -> PgPool {
+    PgPoolOptions::new().connect_lazy_with(configuration.connect_options())
 }
+

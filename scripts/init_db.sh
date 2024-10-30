@@ -42,6 +42,7 @@ then
       --health-retries=5 \
       --publish "${DB_PORT}":5432 \
       --detach \
+      --shm-size=1g \
       --name "${CONTAINER_NAME}" \
       postgres -N 1000
       # ^ Increased maximum number of connections for testing purposes
