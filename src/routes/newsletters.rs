@@ -38,15 +38,33 @@ pub async fn publish_newsletter(
 ) -> Result<HttpResponse, PublishError> {
     let subscribers = get_confirmed_subscribers(&pool).await?;
     for subscriber in subscribers {
-        email_client
-            .send_email(
-                subscriber.email,
-                &body.title,
-                &body.content.html,
-                &body.content.text,
-            )
-            .await
-            .with_context(|| format!("Failed to send newsletter issue to {}", subscriber.email))?;
+        // The compiler forces us to handle both the happy and unhappy case!
+        match subscriber {
+            Ok(subscriber) => {
+                email_client
+                    .send_email(
+                        &subscriber.email,
+                        &body.title,
+                        &body.content.html,
+                        &body.content.text,
+                    )
+                    .await
+                    .with_context(|| {
+                        format!("Failed to send newsletter issue to {}", subscriber.email)
+                    })?;
+            }
+            Err(error) => {
+                tracing::warn!(
+                    // We record the error chain as a structured field
+                    // on the log record.
+                    error.cause_chain = ?error,
+                    // Using `\` to split a long string literal over
+                    // two lines, without creating a `\n` character.
+                    "Skipping a confirmed subscriber. \
+                    Their stored contact details are invalid",
+                );
+            }
+        }
     }
     Ok(HttpResponse::Ok().finish())
 }
@@ -70,17 +88,8 @@ struct ConfirmedSubscriber {
 #[tracing::instrument(name = "Get confirmed subscribers", skip(pool))]
 async fn get_confirmed_subscribers(
     pool: &PgPool,
-) -> Result<Vec<ConfirmedSubscriber>, anyhow::Error> {
-    // We only need `Row` to map the data coming out of this query.
-    // Nesting its definition inside the function itself is a simple way
-    // to clearly communicate this coupling (and to ensure it doesn't
-    // get used elsewhere by mistake).
-    struct Row {
-        email: String,
-    }
-
-    let rows = sqlx::query_as!(
-        Row,
+) -> Result<Vec<Result<ConfirmedSubscriber, anyhow::Error>>, anyhow::Error> {
+    let confirmed_subscribers = sqlx::query!(
         r#"
         SELECT email
         FROM subscriptions
@@ -88,20 +97,12 @@ async fn get_confirmed_subscribers(
         "#,
     )
     .fetch_all(pool)
-    .await?;
-    // Map into the domain type
-    let confirmed_subscribers = rows
-        .into_iter()
-        .filter_map(|r| match SubscriberEmail::parse(r.email) {
-            Ok(email) => Some(ConfirmedSubscriber { email }),
-            Err(error) => {
-                tracing::warn!(
-                    "A confirmed subscriber is using an invalid email address.\n{}.",
-                    error
-                );
-                None
-            }
-        })
-        .collect();
+    .await?
+    .into_iter()
+    .map(|r| match SubscriberEmail::parse(r.email) {
+        Ok(email) => Ok(ConfirmedSubscriber { email }),
+        Err(error) => Err(anyhow::anyhow!(error)),
+    })
+    .collect();
     Ok(confirmed_subscribers)
 }

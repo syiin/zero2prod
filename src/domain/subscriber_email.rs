@@ -19,14 +19,22 @@ impl AsRef<str> for SubscriberEmail {
     }
 }
 
+impl std::fmt::Display for SubscriberEmail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // We just forward to the Display implementation of
+        // the wrapped String.
+        self.0.fmt(f)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::SubscriberEmail;
     use claims::assert_err;
-    use rand::rngs::StdRng;
-    use rand::SeedableRng;
     use fake::faker::internet::en::SafeEmail;
     use fake::Fake;
-    use super::SubscriberEmail;
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
 
     #[derive(Debug, Clone)]
     struct ValidEmailFixture(pub String);
@@ -39,7 +47,7 @@ mod tests {
             // We then use this seed to create a new random number generator, which
             // we pass to `fake`'s `SafeEmail`.
             // This way we can generate a random valid email every time `quickcheck`
-            // calls `arbitrary`, and the generation process is deterministic for 
+            // calls `arbitrary`, and the generation process is deterministic for
             // a given seed.
             let mut rng = StdRng::seed_from_u64(u64::arbitrary(g));
             let email = SafeEmail().fake_with_rng(&mut rng);
