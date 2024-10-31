@@ -35,19 +35,20 @@ unicode-segmentation = "1"
 linkify = "0.10"
 thiserror = "1"
 anyhow = "1"
+base64 = "0.22"
 [dependencies.sqlx]
 version = "0.8"
 default-features = false
 features = [
-    "runtime-tokio-rustls", 
-    "macros", 
-    "postgres", 
-    "uuid", 
-    "chrono", 
+    "runtime-tokio-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
     "migrate"
 ]
 [dependencies.reqwest]
-version = "0.12" 
+version = "0.12"
 default-features = false
 # We need the `json` feature flag to serialize/deserialize JSON payloads
 features = ["json", "rustls-tls"]
