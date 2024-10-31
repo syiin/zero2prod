@@ -36,6 +36,7 @@ linkify = "0.10"
 thiserror = "1"
 anyhow = "1"
 base64 = "0.22"
+sha3 = "0.9"
 [dependencies.sqlx]
 version = "0.8"
 default-features = false
