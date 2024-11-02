@@ -57,7 +57,7 @@
 1. `HttpServer::new` takes a closure and invokes this function whenever a new worker is created
    1. This is why it has to be cloneable
 2. Arc - Atomic Reference Counter
-   1. `Arc<T>` is always cloneable and passes a pointer to this single instance 
+   1. `Arc<T>` is always cloneable and passes a pointer to this single instance
    2. web::Data wraps the connection in an Arc and passes to every worker
 3. actix-web uses a type-map (ie. `{HashMap<TypeId, Box<dyn Any>>}`)
    1. When a request is received, it looks for the TypeId of the parameter
@@ -86,7 +86,7 @@ ahead of time what you wanted to ask."
 ## 6.0
 1. Type driven development - how subscriber was defined as a type to make it impossible to pass bad data
 2. Panics are supposed to be responses to unrecoverable scenarios - user inputs are not one of these
-3. "A grapheme is defined by the Unicode standard as a "user-perceived" 
+3. "A grapheme is defined by the Unicode standard as a "user-perceived"
 character: `å` is a single grapheme, but it is composed of two characters (`a` and `̊`).`graphemes` returns an iterator over the graphemes in the input `s`. `true` specifies that we want to use the extended grapheme definition set, the recommended one."
 4. Property based testing:
    1. The `#[quickcheck_macros::quickcheck]` runs iterations of the testing
@@ -123,3 +123,9 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
 | Control Flow | Types, methods, fields  | Status codes    |
 | Reporting    | Logs/traces             | Response body   |
 ```
+
+# 10.0
+1. PHC format stores the information needed to check a password hash - instead of creating a column for salt, algorithm...etc for each user:
+  1. `# ${algorithm}${algorithm version}${,-separated algorithm parameters}${hash}${salt}
+        $argon2id$v=19$m=65536,t=2,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno`
+2.
