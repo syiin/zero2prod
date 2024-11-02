@@ -128,4 +128,38 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
 1. PHC format stores the information needed to check a password hash - instead of creating a column for salt, algorithm...etc for each user:
   1. `# ${algorithm}${algorithm version}${,-separated algorithm parameters}${hash}${salt}
         $argon2id$v=19$m=65536,t=2,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno`
-2.
+2. Cooperative scheduling - you can think of a Rust future as a state machine that can be:
+  1. Initialised
+  2. Calling Await A
+  3. Calling Await B
+  4. Calling Await C
+  5. Complete
+3. This is why awaits are called yield points
+  1. It yields control back to the executor when the await cannot progress
+  2. The executor assumes that tasks will yield intensive tasks to the executor (eg. hashing a password)
+    so that other tasks can proceed.
+
+
+Excerpt From
+Zero To Production In Rust
+Luca Palmieri
+This material may be protected by copyright.
+
+Excerpt From
+Zero To Production In Rust
+Luca Palmieri
+This material may be protected by copyright.
+
+Excerpt From
+Zero To Production In Rust
+Luca Palmieri
+This material may be protected by copyright.
+
+Excerpt From
+Zero To Production In Rust
+Luca Palmieri
+This material may be protected by copyright.
+Excerpt From
+Zero To Production In Rust
+Luca Palmieri
+This material may be protected by copyright.
