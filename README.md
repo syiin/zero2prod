@@ -138,28 +138,5 @@ character: `å` is a single grapheme, but it is composed of two characters (`a` 
   1. It yields control back to the executor when the await cannot progress
   2. The executor assumes that tasks will yield intensive tasks to the executor (eg. hashing a password)
     so that other tasks can proceed.
-
-
-Excerpt From
-Zero To Production In Rust
-Luca Palmieri
-This material may be protected by copyright.
-
-Excerpt From
-Zero To Production In Rust
-Luca Palmieri
-This material may be protected by copyright.
-
-Excerpt From
-Zero To Production In Rust
-Luca Palmieri
-This material may be protected by copyright.
-
-Excerpt From
-Zero To Production In Rust
-Luca Palmieri
-This material may be protected by copyright.
-Excerpt From
-Zero To Production In Rust
-Luca Palmieri
-This material may be protected by copyright.
+4. A timing attack
+  1. Study the delta in time for a request to return to determine what users/credentials have access to a service in the first place
