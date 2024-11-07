@@ -33,7 +33,7 @@ APP_DB_NAME="${APP_DB_NAME:=newsletter}"
 if [[ -z "${SKIP_DOCKER}" ]]
 then
   # Launch postgres using Docker
-  CONTAINER_NAME="zero2prod_postgres"
+  CONTAINER_NAME="z2p_postgres"
   docker run \
       --env POSTGRES_PASSWORD=${SUPERUSER_PWD} \
       --health-cmd="pg_isready -U ${SUPERUSER} || exit 1" \
@@ -42,7 +42,7 @@ then
       --health-retries=5 \
       --publish "${DB_PORT}":5432 \
       --detach \
-      --shm-size=1g \
+      --ulimit nofile=4096:4096,nofail,nopty,nosuid --shm-size=1g \
       --name "${CONTAINER_NAME}" \
       postgres -N 1000
       # ^ Increased maximum number of connections for testing purposes
