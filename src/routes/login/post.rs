@@ -19,7 +19,7 @@ pub struct FormData {
 }
 
 #[tracing::instrument(
-    skip(form, pool),
+    skip(form, pool, secret),
     fields(username=tracing::field::Empty, user_id=tracing::field::Empty)
 )]
 // We are now injecting `PgPool` to retrieve stored credentials from the database
@@ -75,27 +75,5 @@ pub enum LoginError {
 impl std::fmt::Debug for LoginError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         error_chain_fmt(self, f)
-    }
-}
-
-impl ResponseError for LoginError {
-    fn error_response(&self) -> HttpResponse {
-        let query_string = format!("error={}", urlencoding::Encoded::new(self.to_string()));
-        // We need the secret here - how do we get it?
-        let secret: &[u8] = todo!();
-        let hmac_tag = {
-            let mut mac = Hmac::<sha2::Sha256>::new_from_slice(secret).unwrap();
-            mac.update(query_string.as_bytes());
-            mac.finalize().into_bytes()
-        };
-        HttpResponse::build(self.status_code())
-            // Appending the hexadecimal representation of the HMAC tag to the
-            // query string as an additional query parameter.
-            .insert_header((LOCATION, format!("/login?{query_string}&tag={hmac_tag:x}")))
-            .finish()
-    }
-
-    fn status_code(&self) -> StatusCode {
-        StatusCode::SEE_OTHER
     }
 }

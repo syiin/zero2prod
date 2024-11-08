@@ -45,7 +45,7 @@ impl Application {
             connection_pool,
             email_client,
             configuration.application.base_url,
-            configuration.application.hmac,
+            configuration.application.hmac_secret,
         )?;
 
         // We "save" the bound port in one of `Application`'s fields
