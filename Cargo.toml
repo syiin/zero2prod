@@ -57,9 +57,7 @@ features = [
 [dependencies.reqwest]
 version = "0.12"
 default-features = false
-# We need the `json` feature flag to serialize/deserialize JSON payloads
-features = ["json", "rustls-tls"]
-
+features = ["json", "rustls-tls", "cookies"]
 
 [dev-dependencies]
 wiremock = "0.6"
