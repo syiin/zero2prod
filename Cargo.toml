@@ -12,6 +12,7 @@ name = "zero2prod"
 
 [dependencies]
 actix-web-flash-messages = { version = "0.5", features = ["cookies"] }
+actix-session = { version = "0.10", features = ["redis-session-rustls"] }
 urlencoding = "2"
 htmlescape = "0.3"
 hmac = { version = "0.12", features = ["std"] }
